@@ -1,7 +1,6 @@
 const fields = document.querySelectorAll("#form-user-create [name]");
 let user = {};
 function captureValues(dataUsers, campos) {
-  console.log("teste");
   campos.forEach(function (field, index) {
     if (field.name === "gender") {
       if (field.checked) {
@@ -20,7 +19,7 @@ function addLine(dataUser) {
       <td>${dataUser.name}</td>
       <td>${dataUser.email}</td>
       <td>${dataUser.admin}</td>
-      <td>${dataUser.data}</td>
+      <td>${dataUser.birth}</td>
       <td>
       <button type="button" class="btn btn-primary btn-xs btn-flat">Editar</button>
       <button type="button" class="btn btn-danger btn-xs btn-flat">Excluir</button>
@@ -33,5 +32,14 @@ document
     event.preventDefault();
 
     let values = captureValues(user, fields);
-    addLine(values);
+    let objectUser = new User(
+      values.name,
+      values.birth,
+      values.country,
+      values.email,
+      values.password,
+      values.photo,
+      values.admin
+    );
+    addLine(objectUser);
   });
