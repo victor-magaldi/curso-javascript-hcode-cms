@@ -5,7 +5,7 @@ class UserController {
     this.onSubmit();
   }
   getValues(dataUsers) {
-    let campos = Array.from(this.formEl.elements);
+    let campos = [...this.formEl.elements];
     campos.forEach(function (field, index) {
       if (field.name === "gender") {
         if (field.checked) {
@@ -25,6 +25,7 @@ class UserController {
       let values = this.getValues(user, this.formEl.elements);
       let objectUser = new User(
         values.name,
+        values.gender,
         values.birth,
         values.country,
         values.email,
@@ -32,13 +33,28 @@ class UserController {
         values.photo,
         values.admin
       );
-      this.addLine(objectUser);
+      this.getPhoto((content) => {
+        objectUser.photo = content;
+        this.addLine(objectUser);
+      });
     });
+  }
+  getPhoto(callback) {
+    let filereader = new FileReader();
+
+    let elements = [...this.formEl.elements].filter((item) => {
+      if (item.name == "photo") return item;
+    });
+    let file = elements[0].files[0];
+    filereader.onload = () => {
+      callback(filereader.result);
+    };
+    filereader.readAsDataURL(file);
   }
   addLine(dataUser) {
     let tr = document.createElement("tr");
     tr.innerHTML = `
-         <td><img src="dist/img/user1-128x128.jpg" alt="User Image" class="img-circle img-sm"></td>
+         <td><img src="${dataUser.photo}" alt="User Image" class="img-circle img-sm"></td>
          <td>${dataUser.name}</td>
          <td>${dataUser.email}</td>
          <td>${dataUser.admin}</td>
