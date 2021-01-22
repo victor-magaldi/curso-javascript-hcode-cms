@@ -49,13 +49,14 @@ class UserController {
       let filereader = new FileReader();
 
       let elements = [...this.formEl.elements].filter((item) => {
-        if (item.name == "photo") return item;
+        if (item.name === "photo") return item;
       });
       let file = elements[0].files[0];
+
       filereader.onload = () => {
         resolve(filereader.result);
       };
-      filereader.error = (e) => {
+      filereader.onerror = (e) => {
         reject(e);
       };
       filereader.readAsDataURL(file);
