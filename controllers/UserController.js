@@ -11,6 +11,8 @@ class UserController {
         if (field.checked) {
           dataUsers[field.name] = field.value;
         }
+      } else if (field.name === "admin") {
+        dataUsers[field.name] = field.checked ? "Sim" : "Não";
       } else {
         dataUsers[field.name] = field.value;
       }
@@ -59,7 +61,11 @@ class UserController {
       filereader.onerror = (e) => {
         reject(e);
       };
-      filereader.readAsDataURL(file);
+      if (file) {
+        filereader.readAsDataURL(file);
+      } else {
+        resolve("dist/img/boxed-bg.jpg");
+      }
     });
   }
   addLine(dataUser) {
