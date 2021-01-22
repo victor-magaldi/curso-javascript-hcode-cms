@@ -33,23 +33,33 @@ class UserController {
         values.photo,
         values.admin
       );
-      this.getPhoto((content) => {
-        objectUser.photo = content;
-        this.addLine(objectUser);
-      });
+      this.getPhoto().then(
+        (content) => {
+          objectUser.photo = content;
+          this.addLine(objectUser);
+        },
+        function (e) {
+          console.error(e);
+        }
+      );
     });
   }
-  getPhoto(callback) {
-    let filereader = new FileReader();
+  getPhoto() {
+    return new Promise((resolve, reject) => {
+      let filereader = new FileReader();
 
-    let elements = [...this.formEl.elements].filter((item) => {
-      if (item.name == "photo") return item;
+      let elements = [...this.formEl.elements].filter((item) => {
+        if (item.name == "photo") return item;
+      });
+      let file = elements[0].files[0];
+      filereader.onload = () => {
+        resolve(filereader.result);
+      };
+      filereader.error = (e) => {
+        reject(e);
+      };
+      filereader.readAsDataURL(file);
     });
-    let file = elements[0].files[0];
-    filereader.onload = () => {
-      callback(filereader.result);
-    };
-    filereader.readAsDataURL(file);
   }
   addLine(dataUser) {
     let tr = document.createElement("tr");
