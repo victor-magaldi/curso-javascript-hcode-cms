@@ -7,11 +7,11 @@ class UserController {
   getValues(dataUsers) {
     let campos = [...this.formEl.elements];
     campos.forEach(function (field, index) {
-      if (field.name === "gender") {
+      if (field.name == "gender") {
         if (field.checked) {
           dataUsers[field.name] = field.value;
         }
-      } else if (field.name === "admin") {
+      } else if (field.name == "admin") {
         dataUsers[field.name] = field.checked ? "Sim" : "Não";
       } else {
         dataUsers[field.name] = field.value;
@@ -23,7 +23,7 @@ class UserController {
     let user = {};
     this.formEl.addEventListener("submit", (event) => {
       event.preventDefault();
-
+      const btnSubmit = this.formEl.querySelector("[type=submit]");
       let values = this.getValues(user, this.formEl.elements);
       let objectUser = new User(
         values.name,
@@ -35,10 +35,12 @@ class UserController {
         values.photo,
         values.admin
       );
+      btnSubmit.disabled = true;
       this.getPhoto().then(
         (content) => {
           objectUser.photo = content;
           this.addLine(objectUser);
+          btnSubmit.disabled = false;
         },
         function (e) {
           console.error(e);
@@ -70,12 +72,13 @@ class UserController {
   }
   addLine(dataUser) {
     let tr = document.createElement("tr");
+    console.log(dataUser.name);
     tr.innerHTML = `
          <td><img src="${dataUser.photo}" alt="User Image" class="img-circle img-sm"></td>
          <td>${dataUser.name}</td>
          <td>${dataUser.email}</td>
          <td>${dataUser.admin}</td>
-         <td>${dataUser.birth}</td>
+         <td>${dataUser.register}</td>
          <td>
          <button type="button" class="btn btn-primary btn-xs btn-flat">Editar</button>
          <button type="button" class="btn btn-danger btn-xs btn-flat">Excluir</button>
