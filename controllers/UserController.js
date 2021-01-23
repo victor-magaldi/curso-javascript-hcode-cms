@@ -72,7 +72,7 @@ class UserController {
   }
   addLine(dataUser) {
     let tr = document.createElement("tr");
-    console.log(dataUser.name);
+    console.log(dataUser.register);
     tr.innerHTML = `
          <td><img src="${
            dataUser.photo
