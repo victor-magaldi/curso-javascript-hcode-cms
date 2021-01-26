@@ -25,9 +25,10 @@ class UserController {
         dataUsers[field.name] = field.value;
       }
     });
-    if (isValid) {
-      return dataUsers;
+    if (!isValid) {
+      return false;
     }
+    return dataUsers;
   }
   onSubmit() {
     let user = {};
@@ -35,6 +36,8 @@ class UserController {
       event.preventDefault();
       const btnSubmit = this.formEl.querySelector("[type=submit]");
       let values = this.getValues(user, this.formEl.elements);
+
+      if (!values) return false;
       let objectUser = new User(
         values.name,
         values.gender,
@@ -46,6 +49,7 @@ class UserController {
         values.admin
       );
       btnSubmit.disabled = true;
+
       this.getPhoto().then(
         (content) => {
           objectUser.photo = content;
