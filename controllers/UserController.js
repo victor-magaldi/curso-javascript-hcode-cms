@@ -3,6 +3,7 @@ class UserController {
     this.formEl = document.getElementById(FormId);
     this.tableEl = document.getElementById(tableId);
     this.onSubmit();
+    this.onEdit();
   }
   getValues(dataUsers) {
     let campos = [...this.formEl.elements];
@@ -29,6 +30,13 @@ class UserController {
       return false;
     }
     return dataUsers;
+  }
+  onEdit() {
+    document
+      .querySelector("#box-user-update .btn-cancel")
+      .addEventListener("click", (e) => {
+        this.showPainelCreate();
+      });
   }
   onSubmit() {
     let user = {};
@@ -96,13 +104,26 @@ class UserController {
          <td>${dataUser.admin ? "sim" : "não"}</td>
          <td>${Utils.dateFormat(dataUser.register)}</td>
          <td>
-         <button type="button" class="btn btn-primary btn-xs btn-flat">Editar</button>
+         <button type="button" class="btn btn-primary btn-edit btn-xs btn-flat">Editar</button>
          <button type="button" class="btn btn-danger btn-xs btn-flat">Excluir</button>
          </td>`;
+    tr.querySelector(".btn-edit").addEventListener("click", (e) => {
+      console.log(JSON.parse(tr.dataset.user));
+      this.showPainelUpdate();
+    });
     this.tableEl.appendChild(tr);
 
     this.updateCount();
   }
+  showPainelCreate() {
+    document.getElementById("box-user-create").style.display = "block";
+    document.getElementById("box-user-update").style.display = "none";
+  }
+  showPainelUpdate() {
+    document.getElementById("box-user-create").style.display = "none";
+    document.getElementById("box-user-update").style.display = "block";
+  }
+
   updateCount() {
     let numberUser = 0;
     let numberAdm = 0;
