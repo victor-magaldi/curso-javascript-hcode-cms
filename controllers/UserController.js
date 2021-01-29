@@ -108,7 +108,18 @@ class UserController {
          <button type="button" class="btn btn-danger btn-xs btn-flat">Excluir</button>
          </td>`;
     tr.querySelector(".btn-edit").addEventListener("click", (e) => {
-      console.log(JSON.parse(tr.dataset.user));
+      const json = JSON.parse(tr.dataset.user);
+      const form = document.getElementById("form-user-update");
+      for (let name in json) {
+        document.getElementById("form-user-update");
+        let field = form.querySelector(`[name=${name.replace("_", "")}]`);
+
+        if (field) {
+          if (field == "file") continue;
+
+          field.value = json[name];
+        }
+      }
       this.showPainelUpdate();
     });
     this.tableEl.appendChild(tr);
