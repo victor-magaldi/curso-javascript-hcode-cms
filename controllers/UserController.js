@@ -2,6 +2,7 @@ class UserController {
   constructor(FormId, tableId) {
     this.formEl = document.getElementById(FormId);
     this.tableEl = document.getElementById(tableId);
+    this.formUpdateEl = document.getElementById("form-user-update");
     this.onSubmit();
     this.onEdit();
   }
@@ -111,11 +112,29 @@ class UserController {
       const json = JSON.parse(tr.dataset.user);
       const form = document.getElementById("form-user-update");
       for (let name in json) {
-        document.getElementById("form-user-update");
         let field = form.querySelector(`[name=${name.replace("_", "")}]`);
 
         if (field) {
           if (field.type == "file") continue;
+
+          switch (field.type) {
+            case "file":
+              continue;
+
+            case "radio":
+              field = this.formUpdateEl.querySelector(
+                "[name=" + name.replace("_", "") + "][value=" + json[name] + "]"
+              );
+              field.checked = true;
+              break;
+
+            case "checkbox":
+              field.checked = json[name];
+              break;
+
+            default:
+              field.value = json[name];
+          }
 
           field.value = json[name];
         }
