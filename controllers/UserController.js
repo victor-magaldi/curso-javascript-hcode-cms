@@ -1,13 +1,13 @@
 class UserController {
-  constructor(FormId, tableId) {
+  constructor(FormId, FormIdUpdate, tableId) {
     this.formEl = document.getElementById(FormId);
     this.tableEl = document.getElementById(tableId);
-    this.formUpdateEl = document.getElementById("form-user-update");
+    this.formUpdateEl = document.getElementById(FormIdUpdate);
     this.onSubmit();
     this.onEdit();
   }
-  getValues(dataUsers) {
-    let campos = [...this.formEl.elements];
+  getValues(dataUsers, form) {
+    let campos = [...form.elements];
     let isValid = true;
     campos.forEach(function (field, index) {
       if (
@@ -33,18 +33,53 @@ class UserController {
     return dataUsers;
   }
   onEdit() {
+    let user = {};
+
     document
       .querySelector("#box-user-update .btn-cancel")
       .addEventListener("click", (e) => {
         this.showPainelCreate();
       });
+
+    this.formUpdateEl.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const btnSubmit = this.formUpdateEl.querySelector("[type=submit]");
+      btnSubmit.disabled = true;
+      let values = this.getValues(user, this.formUpdateEl);
+      console.log(values);
+
+      let index = this.formUpdateEl.dataset.trindex;
+      let tr = this.tableEl.rows[index];
+
+      tr.dataset.user = JSON.stringify(values);
+
+      console.log(this.tableEl.rows[index]);
+
+      values.register = new Date();
+
+      tr.innerHTML = `
+      <td><img src="${
+        values.photo
+      }" alt="User Image" class="img-circle img-sm"></td>
+      <td>${values.name}</td>
+      <td>${values.email}</td>
+      <td>${values.admin ? "sim" : "não"}</td>
+      <td>${Utils.dateFormat(values.register)}</td>
+      <td>
+      <button type="button" class="btn btn-primary btn-edit btn-xs btn-flat">Editar</button>
+      <button type="button" class="btn btn-danger btn-xs btn-flat">Excluir</button>
+      </td>`;
+
+      this.addEventsTr(tr);
+      this.updateCount();
+    });
   }
   onSubmit() {
     let user = {};
     this.formEl.addEventListener("submit", (event) => {
       event.preventDefault();
       const btnSubmit = this.formEl.querySelector("[type=submit]");
-      let values = this.getValues(user, this.formEl.elements);
+      let values = this.getValues(user, this.formEl);
 
       if (!values) return false;
       let objectUser = new User(
@@ -58,6 +93,7 @@ class UserController {
         values.admin
       );
       btnSubmit.disabled = true;
+      objectUser._register = new Date();
 
       this.getPhoto().then(
         (content) => {
@@ -95,7 +131,9 @@ class UserController {
   }
   addLine(dataUser) {
     let tr = document.createElement("tr");
+    console.log(dataUser);
     tr.dataset.user = JSON.stringify(dataUser);
+
     tr.innerHTML = `
          <td><img src="${
            dataUser.photo
@@ -108,9 +146,21 @@ class UserController {
          <button type="button" class="btn btn-primary btn-edit btn-xs btn-flat">Editar</button>
          <button type="button" class="btn btn-danger btn-xs btn-flat">Excluir</button>
          </td>`;
+
+    this.addEventsTr(tr);
+
+    this.tableEl.appendChild(tr);
+
+    this.updateCount();
+  }
+
+  addEventsTr(tr) {
     tr.querySelector(".btn-edit").addEventListener("click", (e) => {
       const json = JSON.parse(tr.dataset.user);
       const form = document.getElementById("form-user-update");
+
+      form.dataset.trindex = tr.sectionRowIndex;
+
       for (let name in json) {
         let field = form.querySelector(`[name=${name.replace("_", "")}]`);
 
@@ -141,9 +191,6 @@ class UserController {
       }
       this.showPainelUpdate();
     });
-    this.tableEl.appendChild(tr);
-
-    this.updateCount();
   }
   showPainelCreate() {
     document.getElementById("box-user-create").style.display = "block";
@@ -162,7 +209,7 @@ class UserController {
     tableLis.forEach((item) => {
       numberUser++;
       const user = JSON.parse(item.dataset.user);
-      console.log(user, user._admin);
+
       if (user._admin) numberAdm++;
     });
     document.getElementById("number-users").innerText = numberUser;
