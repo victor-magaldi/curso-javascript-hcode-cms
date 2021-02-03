@@ -6,10 +6,12 @@ class UserController {
     this.onSubmit();
     this.onEdit();
   }
-  getValues(dataUsers, form) {
-    let campos = [...form.elements];
+
+  getValues(formEl) {
+    let user = {};
     let isValid = true;
-    campos.forEach(function (field, index) {
+
+    [...formEl.elements].forEach(function (field, index) {
       if (
         ["name", "email", "password"].indexOf(field.name) > -1 &&
         !field.value
@@ -17,21 +19,34 @@ class UserController {
         field.parentElement.classList.add("has-error");
         isValid = false;
       }
+
       if (field.name == "gender") {
         if (field.checked) {
-          dataUsers[field.name] = field.value;
+          user[field.name] = field.value;
         }
       } else if (field.name == "admin") {
-        dataUsers[field.name] = field.checked ? true : false;
+        user[field.name] = field.checked;
       } else {
-        dataUsers[field.name] = field.value;
+        user[field.name] = field.value;
       }
     });
+
     if (!isValid) {
       return false;
     }
-    return dataUsers;
+
+    return new User(
+      user.name,
+      user.gender,
+      user.birth,
+      user.country,
+      user.email,
+      user.password,
+      user.photo,
+      user.admin
+    );
   }
+
   onEdit() {
     let user = {};
 
@@ -45,7 +60,7 @@ class UserController {
       event.preventDefault();
       const btnSubmit = this.formUpdateEl.querySelector("[type=submit]");
       btnSubmit.disabled = true;
-      let values = this.getValues(user, this.formUpdateEl);
+      let values = this.getValues(this.formUpdateEl);
       console.log(values);
 
       let index = this.formUpdateEl.dataset.trindex;
@@ -87,12 +102,12 @@ class UserController {
       this.showPainelCreate();
     });
   }
+
   onSubmit() {
-    let user = {};
     this.formEl.addEventListener("submit", (event) => {
       event.preventDefault();
       const btnSubmit = this.formEl.querySelector("[type=submit]");
-      let values = this.getValues(user, this.formEl);
+      let values = this.getValues(this.formEl);
 
       if (!values) return false;
       let objectUser = new User(
@@ -121,6 +136,7 @@ class UserController {
       this.formEl.reset();
     });
   }
+
   getPhoto() {
     return new Promise((resolve, reject) => {
       let filereader = new FileReader();
@@ -143,6 +159,7 @@ class UserController {
       }
     });
   }
+
   addLine(dataUser) {
     let tr = document.createElement("tr");
     console.log(dataUser);
@@ -215,10 +232,12 @@ class UserController {
       this.showPainelUpdate();
     });
   }
+
   showPainelCreate() {
     document.getElementById("box-user-create").style.display = "block";
     document.getElementById("box-user-update").style.display = "none";
   }
+
   showPainelUpdate() {
     document.getElementById("box-user-create").style.display = "none";
     document.getElementById("box-user-update").style.display = "block";
