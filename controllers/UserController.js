@@ -5,6 +5,7 @@ class UserController {
     this.formUpdateEl = document.getElementById(FormIdUpdate);
     this.onSubmit();
     this.onEdit();
+    this.selecAll();
   }
 
   getValues(formEl) {
@@ -69,10 +70,6 @@ class UserController {
       let userOld = JSON.parse(tr.dataset.user);
 
       let result = Object.assign({}, userOld, values);
-
-      console.log(this.tableEl.rows[index]);
-
-      result._register = new Date();
 
       this.getPhoto(this.formUpdateEl).then(
         (content) => {
@@ -168,9 +165,37 @@ class UserController {
     });
   }
 
+  getUserStorage() {
+    let users = [];
+    if (sessionStorage.getItem("users")) {
+      users = JSON.parse(sessionStorage.getItem("users"));
+    }
+    return users;
+  }
+
+  selecAll() {
+    let users = this.getUserStorage("users");
+    users.forEach((dataUser) => {
+      const user = new User(dataUser);
+      console.log(user);
+      user.loadFromJson(dataUser);
+      this.addLine(dataUser);
+    });
+  }
+
+  insert(data) {
+    const users = this.getUserStorage();
+
+    users.push(data);
+
+    sessionStorage.setItem("users", JSON.stringify(users));
+  }
+
   addLine(dataUser) {
     let tr = document.createElement("tr");
-    console.log(dataUser);
+
+    this.insert(dataUser);
+
     tr.dataset.user = JSON.stringify(dataUser);
 
     tr.innerHTML = `
