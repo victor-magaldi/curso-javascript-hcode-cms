@@ -69,37 +69,45 @@ class UserController {
       let userOld = JSON.parse(tr.dataset.user);
 
       let result = Object.assign({}, userOld, values);
-      console.log(userOld);
-      if (!values._photo) {
-        console.log(result);
-        result._photo = userOld._photo;
-        console.log(result);
-      }
-      tr.dataset.user = JSON.stringify(values);
 
       console.log(this.tableEl.rows[index]);
 
       result._register = new Date();
 
-      tr.innerHTML = `
-      <td><img src="${
-        result._photo
-      }" alt="User Image" class="img-circle img-sm"></td>
-      <td>${result._name}</td>
-      <td>${result._email}</td>
-      <td>${result._admin ? "sim" : "não"}</td>
-      <td>${Utils.dateFormat(result._register)}</td>
-      <td>
-      <button type="button" class="btn btn-primary btn-edit btn-xs btn-flat">Editar</button>
-      <button type="button" class="btn btn-danger btn-xs btn-flat">Excluir</button>
-      </td>`;
+      this.getPhoto(this.formUpdateEl).then(
+        (content) => {
+          if (!values._photo) {
+            result._photo = userOld._photo;
+          } else {
+            result._photo = content;
+          }
 
-      this.addEventsTr(tr);
-      this.updateCount();
+          tr.dataset.user = JSON.stringify(values);
 
-      this.formUpdateEl.reset();
-      btnSubmit.disabled = false;
-      this.showPainelCreate();
+          tr.innerHTML = `
+            <td><img src="${
+              result._photo
+            }" alt="User Image" class="img-circle img-sm"></td>
+            <td>${result._name}</td>
+            <td>${result._email}</td>
+            <td>${result._admin ? "sim" : "não"}</td>
+            <td>${Utils.dateFormat(result._register)}</td>
+            <td>
+            <button type="button" class="btn btn-primary btn-edit btn-xs btn-flat">Editar</button>
+            <button type="button" class="btn btn-danger btn-xs btn-flat">Excluir</button>
+            </td>`;
+
+          this.addEventsTr(tr);
+          this.updateCount();
+
+          this.formUpdateEl.reset();
+          btnSubmit.disabled = false;
+          this.showPainelCreate();
+        },
+        function (e) {
+          console.error(e);
+        }
+      );
     });
   }
 
@@ -123,7 +131,7 @@ class UserController {
       btnSubmit.disabled = true;
       objectUser._register = new Date();
 
-      this.getPhoto().then(
+      this.getPhoto(this.formEl).then(
         (content) => {
           objectUser.photo = content;
           this.addLine(objectUser);
@@ -137,11 +145,11 @@ class UserController {
     });
   }
 
-  getPhoto() {
+  getPhoto(formEl) {
     return new Promise((resolve, reject) => {
       let filereader = new FileReader();
 
-      let elements = [...this.formEl.elements].filter((item) => {
+      let elements = [...formEl.elements].filter((item) => {
         if (item.name === "photo") return item;
       });
       let file = elements[0].files[0];
