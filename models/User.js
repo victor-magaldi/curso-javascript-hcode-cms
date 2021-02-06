@@ -62,6 +62,8 @@ class User {
       switch (name) {
         case "_register":
           this[name] = new Date(json[name]);
+
+          console.log(this[name]);
           break;
         default:
           this[name] = json[name];

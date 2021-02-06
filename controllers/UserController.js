@@ -47,7 +47,6 @@ class UserController {
       user.admin
     );
   }
-
   onEdit() {
     let user = {};
 
@@ -62,7 +61,6 @@ class UserController {
       const btnSubmit = this.formUpdateEl.querySelector("[type=submit]");
       btnSubmit.disabled = true;
       let values = this.getValues(this.formUpdateEl);
-      console.log(values);
 
       let index = this.formUpdateEl.dataset.trindex;
       let tr = this.tableEl.rows[index];
@@ -73,7 +71,7 @@ class UserController {
 
       this.getPhoto(this.formUpdateEl).then(
         (content) => {
-          if (!values._photo) {
+          if (!values.photo) {
             result._photo = userOld._photo;
           } else {
             result._photo = content;
@@ -91,7 +89,7 @@ class UserController {
             <td>${Utils.dateFormat(result._register)}</td>
             <td>
             <button type="button" class="btn btn-primary btn-edit btn-xs btn-flat">Editar</button>
-            <button type="button" class="btn btn-danger btn-xs btn-flat">Excluir</button>
+            <button type="button" class="btn btn-danger btn-xs btn-delete  btn-flat">Excluir</button>
             </td>`;
 
           this.addEventsTr(tr);
@@ -126,19 +124,21 @@ class UserController {
         values.admin
       );
       btnSubmit.disabled = true;
-      objectUser._register = new Date();
 
       this.getPhoto(this.formEl).then(
         (content) => {
           objectUser.photo = content;
+
+          this.insert(objectUser);
           this.addLine(objectUser);
+
+          this.formEl.reset();
           btnSubmit.disabled = false;
         },
         function (e) {
           console.error(e);
         }
       );
-      this.formEl.reset();
     });
   }
 
@@ -177,7 +177,6 @@ class UserController {
     let users = this.getUserStorage("users");
     users.forEach((dataUser) => {
       const user = new User(dataUser);
-      console.log(user);
       user.loadFromJson(dataUser);
       this.addLine(dataUser);
     });
@@ -194,18 +193,15 @@ class UserController {
   addLine(dataUser) {
     let tr = document.createElement("tr");
 
-    this.insert(dataUser);
-
     tr.dataset.user = JSON.stringify(dataUser);
-
     tr.innerHTML = `
          <td><img src="${
-           dataUser.photo
+           dataUser._photo
          }" alt="User Image" class="img-circle img-sm"></td>
-         <td>${dataUser.name}</td>
-         <td>${dataUser.email}</td>
-         <td>${dataUser.admin ? "sim" : "não"}</td>
-         <td>${Utils.dateFormat(dataUser.register)}</td>
+         <td>${dataUser._name}</td>
+         <td>${dataUser._email}</td>
+         <td>${dataUser._admin ? "sim" : "não"}</td>
+         <td>${Utils.dateFormat(new Date(dataUser._register))}</td>
          <td>
          <button type="button" class="btn btn-primary btn-edit btn-xs btn-flat">Editar</button>
          <button type="button" class="btn btn-danger btn-xs btn-delete  btn-flat">Excluir</button>
